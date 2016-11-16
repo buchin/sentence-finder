@@ -9,7 +9,7 @@ describe('Feature: Find Sentence', function(){
 
 	context('Scenario:', function(){
 		given('word', function(){
-			return 'telor';
+			return 'makan nasi';
 		});
 
 		given('finder', function(){

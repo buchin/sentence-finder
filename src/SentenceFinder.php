@@ -38,7 +38,7 @@ class SentenceFinder
 		$response = $this->_client->get('http://www.bing.com/search', [
 			'query' => [
 				'format' => 'rss',
-				'q' => 'inbody:' . $word,
+				'q' => 'inbody:"' . $word . '"',
 				]
 			]);
 
