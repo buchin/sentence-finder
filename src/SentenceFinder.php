@@ -7,8 +7,7 @@ use GuzzleHttp\Client;
 class SentenceFinder
 {
 	protected $_client = null;
-	protected $_stop = '.';
-	private $word = null;
+	protected $_stop = '/[.?!]/';
 
 	public function __construct()
 	{
@@ -59,12 +58,12 @@ class SentenceFinder
 
 	public function parseResult($result, $word)
 	{
-		$extracted = explode($this->_stop, $result);
+		$extracted = preg_split($this->_stop, $result);
 
 		foreach ($extracted as $sentence) {
 			$pos = stripos($sentence, $word);
 			if($pos !== false){
-				return trim($sentence) . $this->_stop;
+				return trim($sentence);
 			}
 		}
 	}
