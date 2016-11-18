@@ -49,7 +49,7 @@ describe('SentenceFinder', function(){
 		it('should return string containing sentence', function(){
 			$sentence = $this->sf->parseResult($this->result, $this->word);
 
-			expect($sentence)->toBe('Hanya dengan voucher promosi diskon di Lakupon, Anda bisa makan hemat setiap hari');
+			expect($sentence)->toBe('Hanya dengan voucher promosi diskon di Lakupon, Anda bisa makan hemat setiap hari.');
 			expect($sentence[0])->not->toBe(' ');
 		});
 	});
