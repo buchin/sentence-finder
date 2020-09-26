@@ -61,15 +61,17 @@ class SentenceFinder
 
 		$new_sentences = [];
 		foreach ($extracted as $sentence) {
-			$pos = $this->str_contains($sentence, ['-', '–']);
-            $word_count = explode(' ', $sentence);
+            $sentence = preg_replace('/\.+/', '.', trim($sentence));
+            $sentence = str_replace(' .', '.', $sentence);
+			$pos = $this->str_contains($sentence, ['-', '–', 'http']);
+            $word_count = count(explode(' ', $sentence));
+
 			if($pos === false && $word_count > 4){
 				$sentence = str_replace(['"'], '', $sentence);
 				$sentence = ucfirst(strtolower($sentence));
-				$new_sentences[] = rand(0, 1) ? $this->remove_common_words($sentence) : $sentence;
+				$new_sentences[] = $sentence;
 			}
 		}
-
 		return $new_sentences;
 	}
 
