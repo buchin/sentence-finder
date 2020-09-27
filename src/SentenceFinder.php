@@ -68,7 +68,7 @@ class SentenceFinder
 
 			if($pos === false && $word_count > 4){
 				$sentence = str_replace(['"'], '', $sentence);
-				$sentence = ucfirst(strtolower($sentence));
+				$sentence = $this->mb_ucfirst(mb_strtolower($sentence));
 				$new_sentences[] = $sentence;
 			}
 		}
@@ -94,5 +94,15 @@ class SentenceFinder
 		$sentence = preg_replace('/\b('.implode('|',$commonWords).')\b/','',$input);
 		$sentence = preg_replace('/\s+/', ' ',$sentence);
 		return $sentence;
+	}
+
+	public function mb_ucfirst(string $str, string $encoding = null): string
+	{
+	    if (is_null($encoding)) {
+	        $encoding = mb_internal_encoding();
+	    }
+
+	    return mb_strtoupper(mb_substr($str, 0, 1, $encoding), $encoding) .
+	        mb_substr($str, 1, null, $encoding);
 	}
 }
