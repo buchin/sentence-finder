@@ -1,6 +1,9 @@
 <?php
 namespace Buchin\SentenceFinder;
 use GuzzleHttp\Client;
+use DOMDocument;
+use DOMXpath;
+
 /**
 *
 */
@@ -33,23 +36,27 @@ class SentenceFinder
 
 	public function getBingRss($word)
 	{
-		$response = $this->_client->get('http://www.bing.com/search', [
-			'query' => [
-				'format' => 'rss',
-				'q' => $word,
-				]
-			]);
+		$url = 'https://html.duckduckgo.com/html/?q=' . urlencode($word);
 
-		return ($response->getStatusCode() == 200) ? $response->getBody()->getContents() : false;
+		$response = file_get_contents($url);
+
+		return $response;
 	}
 
 	public function parseBingRss($rss)
 	{
 		$results = [];
-		$xml = simplexml_load_string($rss)->xpath('//channel/item');
+		
+		$dom = new DOMDocument;
+		libxml_use_internal_errors(TRUE);
+		$dom->loadHTML($rss);
+		libxml_use_internal_errors(FALSE);
 
-		foreach ($xml as $node) {
-			$results[] = (string) $node->description;
+		$xpath = new DOMXpath($dom);
+		$elements = $xpath->query("//a[contains(@class,'result__snippet')]");
+
+		foreach ($elements as $element) {
+			$results[] = $element->textContent;
 		}
 
 		return $results;
