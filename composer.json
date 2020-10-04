@@ -1,7 +1,7 @@
 {
 	"name": "buchin/sentence-finder",
 	"description": "This package find sentence from given word/phrase",
-	"license": "Halal",
+	"license": "MIT",
 	"keywords": ["sentence", "word", "finder", "language"],
 	"authors": [
 		{
