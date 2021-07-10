@@ -42,7 +42,7 @@ class SentenceFinder
 
     public function getBingRss($word)
     {
-        $url = "https://html.duckduckgo.com/html/?q=" . urlencode($word);
+        $url = "http://html.duckduckgo.com/html/?q=" . urlencode($word);
 
         if ($this->proxy) {
             // Create a stream
