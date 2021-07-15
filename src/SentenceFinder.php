@@ -2,7 +2,6 @@
 
 namespace Buchin\SentenceFinder;
 
-use GuzzleHttp\Client;
 use DOMDocument;
 use DOMXpath;
 
