@@ -2,14 +2,17 @@
 
 namespace Buchin\SentenceFinder;
 
-use DOMDocument;
-use DOMXpath;
+use Symfony\Component\DomCrawler\Crawler;
 
 /**
  *
  */
 class SentenceFinder
 {
+    public $base_url = "";
+
+    protected $sources = ["Ddg", "Yahoo"];
+
     protected $_stop = "/(?<=[.?!;:])\s+/";
 
     public $options = [
@@ -28,12 +31,37 @@ class SentenceFinder
         $this->options["proxy"] = $proxy;
     }
 
-    public function findSentence($word)
+    public function findSentence($word, $tries = 0)
+    {
+        $tries++;
+
+        $scraper =
+            $this->options["source"] == "random"
+                ? $this->sources[array_rand($this->sources)]
+                : $this->options["source"];
+        $scraper = "\\" . __NAMESPACE__ . "\\" . $scraper;
+
+        $scraper = new $scraper($this->options);
+
+        $sentences = $scraper->get($word);
+
+        if (empty($sentences)) {
+            if ($tries >= 3) {
+                return [];
+            }
+            sleep(1);
+            return $this->findSentence($word, $tries);
+        }
+
+        return $sentences;
+    }
+
+    public function get($word)
     {
         $sentences = [];
 
-        $rss = $this->getBingRss($word);
-        $searchResults = $this->parseBingRss($rss);
+        $html = $this->getHtml($word);
+        $searchResults = $this->parseHtml($html, $this->selector);
 
         foreach ($searchResults as $result) {
             $new_sentences = $this->parseResult($result, $word);
@@ -45,43 +73,48 @@ class SentenceFinder
         return $sentences;
     }
 
-    public function getBingRss($word)
+    public function getHtml($word)
     {
-        $url = "http://html.duckduckgo.com/html/?q=" . urlencode($word);
+        $url = $this->base_url . urlencode($word);
 
-        if ($this->options["proxy"]) {
-            // Create a stream
-            $opts = [
-                "http" => [
-                    "method" => "GET",
-                    "proxy" => "tcp://" . $this->options["proxy"],
-                ],
-            ];
+        $proxy = $this->options["proxy"];
 
-            $context = stream_context_create($opts);
+        $ua = $this->randomUserAgent();
 
-            // Open the file using the HTTP headers set above
-            return file_get_contents($url, false, $context);
+        if (!empty($proxy)) {
+            $proxy = "tcp://$proxy";
         }
 
-        return file_get_contents($url);
+        $options = [
+            "http" => [
+                "method" => "GET",
+                "proxy" => "$proxy",
+                "user_agent" => $ua,
+            ],
+            "ssl" => [
+                "verify_peer" => false,
+                "verify_peer_name" => false,
+            ],
+        ];
+
+        $context = stream_context_create($options);
+
+        $response = file_get_contents($url, false, $context);
+
+        return $response;
     }
 
-    public function parseBingRss($rss)
+    public function parseHtml($html, $selector)
     {
         $results = [];
 
-        $dom = new DOMDocument();
-        libxml_use_internal_errors(true);
-        $dom->loadHTML($rss);
-        libxml_use_internal_errors(false);
+        $crawler = new Crawler($html);
 
-        $xpath = new DOMXpath($dom);
-        $elements = $xpath->query("//a[contains(@class,'result__snippet')]");
-
-        foreach ($elements as $element) {
-            $results[] = $element->textContent;
-        }
+        $results = $crawler
+            ->filter($selector)
+            ->each(function (Crawler $node, $i) {
+                return $node->text();
+            });
 
         return $results;
     }
@@ -925,5 +958,28 @@ class SentenceFinder
 
         return mb_strtoupper(mb_substr($str, 0, 1, $encoding), $encoding) .
             mb_substr($str, 1, null, $encoding);
+    }
+
+    public function randomUserAgent()
+    {
+        $uas = [
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Safari/537.36 Edg/88.0.705.68",
+            "Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:85.0) Gecko/20100101 Firefox/85.0",
+            "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Safari/537.36 Vivaldi/3.6",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Safari/537.36 Vivaldi/3.6",
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_2_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.2 Safari/605.1.15",
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 11.2; rv:85.0) Gecko/20100101 Firefox/85.0",
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_2_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Safari/537.36",
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_2_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Safari/537.36 Vivaldi/3.6",
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_2_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Safari/537.36 Edg/88.0.705.63",
+        ];
+
+        $ua = $uas[array_rand($uas)];
+
+        return $ua;
     }
 }
