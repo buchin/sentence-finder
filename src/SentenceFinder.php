@@ -1,5 +1,7 @@
 <?php
+
 namespace Buchin\SentenceFinder;
+
 use GuzzleHttp\Client;
 use DOMDocument;
 use DOMXpath;
@@ -9,18 +11,22 @@ use DOMXpath;
  */
 class SentenceFinder
 {
-    protected $_client = null;
     protected $_stop = "/(?<=[.?!;:])\s+/";
-    public $proxy = false;
 
-    public function __construct()
+    public $options = [
+        "proxy" => false,
+        "source" => "random",
+        "retry" => 3,
+    ];
+
+    public function __construct($options = [])
     {
-        $this->_client = new Client();
+        $this->options = array_merge($this->options, $options);
     }
 
     public function setProxy($proxy)
     {
-        $this->proxy = $proxy;
+        $this->options["proxy"] = $proxy;
     }
 
     public function findSentence($word)
@@ -44,12 +50,12 @@ class SentenceFinder
     {
         $url = "http://html.duckduckgo.com/html/?q=" . urlencode($word);
 
-        if ($this->proxy) {
+        if ($this->options["proxy"]) {
             // Create a stream
             $opts = [
                 "http" => [
                     "method" => "GET",
-                    "proxy" => "tcp://" . $this->proxy,
+                    "proxy" => "tcp://" . $this->options["proxy"],
                 ],
             ];
 

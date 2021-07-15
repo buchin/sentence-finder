@@ -1,24 +1,28 @@
 {
-	"name": "buchin/sentence-finder",
-	"description": "This package find sentence from given word/phrase",
-	"license": "MIT",
-	"keywords": ["sentence", "word", "finder", "language"],
-	"authors": [
-		{
-			"name": "Mochammad Masbuchin",
-			"email": "buchin@dropsugar.com"
-		}
-	],
-	"require": {
-		"guzzlehttp/guzzle": "~6.0",
-		"campo/random-user-agent": "^1.2"
-	},
-	"require-dev": {
-		"kahlan/kahlan": "^3.0"
-	},
-	"autoload": {
-		"psr-4": {
-			"Buchin\\SentenceFinder\\": "src"
-		}
-	}
+    "name": "buchin/sentence-finder",
+    "description": "This package find sentence from given word/phrase",
+    "license": "MIT",
+    "keywords": [
+        "sentence",
+        "word",
+        "finder",
+        "language"
+    ],
+    "authors": [
+        {
+            "name": "Mochammad Masbuchin",
+            "email": "buchin@dropsugar.com"
+        }
+    ],
+    "require": {
+        "campo/random-user-agent": "^1.2"
+    },
+    "require-dev": {
+        "kahlan/kahlan": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Buchin\\SentenceFinder\\": "src"
+        }
+    }
 }
