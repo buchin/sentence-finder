@@ -14,7 +14,7 @@ describe("Feature: Find Sentence", function () {
         });
 
         describe("User find sentence using given word", function () {
-            $finders = ["Ask", "Ddg", "Yahoo"];
+            $finders = ["Ask", "Ddg"];
 
             it(
                 "is using SentenceFinder and should returns array of sentence",

@@ -11,7 +11,7 @@ class SentenceFinder
 {
     public $base_url = "";
 
-    protected $sources = ["Ddg", "Yahoo"];
+    protected $sources = ["Ddg", "Ask"];
 
     protected $_stop = "/(?<=[.?!;:])\s+/";
 
@@ -133,6 +133,7 @@ class SentenceFinder
             if ($pos === false && $word_count > 4) {
                 $sentence = str_replace(['"'], "", $sentence);
                 $sentence = $this->mb_ucfirst(mb_strtolower($sentence));
+                $sentence = strip_tags($sentence);
                 $new_sentences[] = $sentence;
             }
         }
