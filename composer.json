@@ -17,7 +17,8 @@
     "require": {
         "campo/random-user-agent": "^1.2",
         "symfony/dom-crawler": "^5.3",
-        "symfony/css-selector": "^5.3"
+        "symfony/css-selector": "^5.3",
+        "buchin/bing": "^1.0"
     },
     "require-dev": {
         "kahlan/kahlan": "^3.0"
